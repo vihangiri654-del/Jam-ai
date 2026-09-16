@@ -1,0 +1,11 @@
+{
+  "name": "JAM AI",
+  "description": "JAM AI (जैम एआई) — Universal AI Platform created by Vihaan Giri. ChatGPT-grade neural voice, multi-cut pro video reel & car edit engine, live app builder studio, instant sub-second AI reasoning, and official Android APK.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

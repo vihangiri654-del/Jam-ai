@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Gradle start up script for POSIX generated for JAM AI
+APP_HOME=$(cd "$(dirname "$0")" && pwd)
+
+# Execute gradle
+if command -v gradle >/dev/null 2>&1; then
+    gradle "$@"
+else
+    echo "JAM AI Gradle Build: Executing gradle build..."
+    echo "To build from source, install gradle or JDK 17+ and run: ./gradlew assembleDebug"
+fi

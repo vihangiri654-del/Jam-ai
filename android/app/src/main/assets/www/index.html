@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>JAM AI Mobile • Vihaan Giri</title>
+  <meta name="theme-color" content="#090d16" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      background-color: #050811;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    
+    /* Header */
+    header {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .brand-wrap { display: flex; align-items: center; gap: 10px; }
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #6366f1, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+    }
+    .brand-title { font-size: 16px; font-weight: 800; color: #ffffff; line-height: 1.2; letter-spacing: -0.3px; }
+    .brand-sub { font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 4px; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; }
+
+    /* Top Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      background: #0b1120;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+      padding: 6px 12px;
+      gap: 6px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      border-color: rgba(99, 102, 241, 0.35);
+    }
+
+    /* Views container */
+    .view-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+    .tab-panel { display: none; flex-direction: column; height: 100%; flex: 1; }
+    .tab-panel.active { display: flex; }
+
+    /* Chat Messages */
+    .chat-container {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+    }
+    .msg {
+      max-width: 88%;
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.55;
+      position: relative;
+      word-break: break-word;
+    }
+    .msg-user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #4f46e5, #4338ca);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+    }
+    .msg-ai {
+      align-self: flex-start;
+      background: #131d31;
+      border: 1px solid rgba(51, 65, 85, 0.7);
+      color: #e2e8f0;
+      border-bottom-left-radius: 4px;
+    }
+    .msg-author {
+      font-size: 10px;
+      font-weight: 700;
+      color: #818cf8;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .msg-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .action-icon-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    .action-icon-btn:hover { color: #ffffff; background: rgba(255, 255, 255, 0.1); }
+
+    /* Quick Suggestion Chips */
+    .chips-row {
+      display: flex;
+      gap: 6px;
+      padding: 8px 16px;
+      overflow-x: auto;
+      background: #070c18;
+      border-top: 1px solid rgba(51, 65, 85, 0.3);
+    }
+    .chip {
+      padding: 6px 12px;
+      background: #111b2e;
+      border: 1px solid rgba(51, 65, 85, 0.6);
+      border-radius: 20px;
+      font-size: 11px;
+      color: #cbd5e1;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .chip:active { background: #1e293b; color: #818cf8; }
+
+    /* Chat Input Bar */
+    .input-bar {
+      padding: 10px 14px;
+      background: #0d1527;
+      border-top: 1px solid rgba(51, 65, 85, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chat-input {
+      flex: 1;
+      background: #162035;
+      border: 1px solid #334155;
+      color: #ffffff;
+      padding: 10px 14px;
+      border-radius: 24px;
+      font-size: 14px;
+      outline: none;
+    }
+    .chat-input:focus { border-color: #6366f1; }
+    .send-btn, .mic-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      flex-shrink: 0;
+      transition: transform 0.1s;
+    }
+    .send-btn { background: #6366f1; color: #ffffff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+    .send-btn:active { transform: scale(0.92); }
+    .mic-btn { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .mic-btn.recording { background: #ef4444; color: #ffffff; animation: pulse 1s infinite; }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+      70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    /* Image Studio Tab */
+    .image-panel { padding: 16px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+    .img-input-box {
+      background: #111b2e;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .img-prompt {
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      height: 60px;
+    }
+    .generate-btn {
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(236, 72, 153, 0.3);
+    }
+    .img-preview-box {
+      flex: 1;
+      background: #0d1527;
+      border: 1px dashed #334155;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 260px;
+      position: relative;
+      overflow: hidden;
+    }
+    .result-image {
+      width: 100%;
+      height: 100%;
+      max-height: 380px;
+      object-fit: contain;
+      border-radius: 14px;
+    }
+
+    /* Arcade Games Tab */
+    .game-panel { padding: 14px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+    .game-select-row { display: flex; gap: 8px; }
+    .game-badge-btn {
+      flex: 1;
+      padding: 10px;
+      background: #111b2e;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      color: #cbd5e1;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+    .game-badge-btn.active {
+      background: #4f46e5;
+      color: #ffffff;
+      border-color: #6366f1;
+    }
+    .game-canvas-wrap {
+      position: relative;
+      background: #000000;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 320px;
+    }
+    #gameCanvas {
+      width: 100%;
+      height: 100%;
+      background: #05050f;
+    }
+    /* Mobile Virtual Controls */
+    .virtual-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 4px 0;
+    }
+    .ctrl-btn {
+      background: #1e293b;
+      border: 1px solid #475569;
+      color: #ffffff;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ctrl-btn:active { background: #4f46e5; }
+    .fire-btn { background: #ef4444; border-color: #f87171; grid-column: span 3; }
+
+    /* Study Lab Tab */
+    .study-panel { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .card-box {
+      background: #111b2e;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 8px;
+    }
+    .card-title { font-size: 14px; font-weight: 700; color: #f59e0b; margin-bottom: 6px; }
+    .quiz-opt-btn {
+      width: 100%;
+      text-align: left;
+      padding: 10px 14px;
+      background: #162035;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-size: 13px;
+      margin-top: 6px;
+      cursor: pointer;
+    }
+    .quiz-opt-btn:active { background: #4f46e5; border-color: #818cf8; }
+
+    /* Code block styling */
+    pre {
+      background: #020617;
+      border: 1px solid #1e293b;
+      padding: 8px 12px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-family: monospace;
+      font-size: 12px;
+      margin: 6px 0;
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Header -->
+  <header>
+    <div class="brand-wrap">
+      <div class="brand-logo">JAM</div>
+      <div>
+        <div class="brand-title">JAM AI Mobile</div>
+        <div class="brand-sub">
+          <span class="status-dot"></span>
+          <span>Architected by Vihaan Giri • v3.8</span>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; gap: 6px;">
+      <button onclick="clearChat()" class="action-icon-btn" title="Clear Conversation" style="background:#1e293b; padding:6px 10px; border-radius:8px;">
+        🗑️ Clear
+      </button>
+    </div>
+  </header>
+
+  <!-- Navigation Mode Tabs -->
+  <nav class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('chat', this)">
+      💬 <span>AI Chat</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('images', this)">
+      🎨 <span>Image Studio</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('games', this)">
+      🎮 <span>Arcade Games</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('study', this)">
+      📚 <span>Study Lab</span>
+    </button>
+  </nav>
+
+  <!-- Main Views Container -->
+  <div class="view-content">
+
+    <!-- TAB 1: AI Chat -->
+    <div id="tab-chat" class="tab-panel active">
+      <div id="chatMessages" class="chat-container">
+        <!-- AI Welcome Greeting -->
+        <div class="msg msg-ai">
+          <div class="msg-author">JAM AI Assistant</div>
+          <p>नमस्ते! मैं JAM AI (J-A-M AI) हूँ, आपका निजी AI असिस्टेंट — जिसे <strong>Vihaan Giri</strong> ने डिज़ाइन किया है।</p>
+          <p style="margin-top: 6px;">मैं कोडिंग, सवालों के जवाब, हिंदी/इंग्लिश बातचीत, गेम बनाने, और इमेज जनरेट करने में पूरी तरह सक्षम हूँ। नीचे दिए गए विकल्पों में से चुनें या कोई भी सवाल पूछें!</p>
+          <div class="msg-actions">
+            <button class="action-icon-btn" onclick="speakText(this.parentElement.previousElementSibling.innerText)">
+              🔊 सुनें
+            </button>
+            <button class="action-icon-btn" onclick="copyMessageText(this)">
+              📋 कॉपी
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suggestion chips -->
+      <div class="chips-row">
+        <div class="chip" onclick="sendChip('एक अंतरिक्ष स्पेस शूटर गेम का कोड बताओ')">🚀 Space Shooter Game</div>
+        <div class="chip" onclick="sendChip('भविष्य की सुपरकार की इमेज बनाओ')">🏎️ Futuristic Car Image</div>
+        <div class="chip" onclick="sendChip('Physics का एक मजेदार क्विज दो')">🔬 Physics Quiz</div>
+        <div class="chip" onclick="sendChip('जीवन में सफलता के 3 सुनहरे नियम')">✨ Success Rules</div>
+        <div class="chip" onclick="sendChip('Hindi Poetry / प्रेरणादायक शायरी')">✍️ Shayari</div>
+      </div>
+
+      <!-- Chat input bar -->
+      <div class="input-bar">
+        <button id="micBtn" class="mic-btn" onclick="toggleVoiceInput()" title="Voice Input">
+          🎤
+        </button>
+        <input
+          type="text"
+          id="chatInput"
+          class="chat-input"
+          placeholder="Type message or ask anything..."
+          onkeydown="if(event.key === 'Enter') handleSendChat()"
+        />
+        <button class="send-btn" onclick="handleSendChat()" title="Send">
+          ➤
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 2: Image Studio -->
+    <div id="tab-images" class="tab-panel">
+      <div class="image-panel">
+        <div class="img-input-box">
+          <label style="font-size: 12px; font-weight: 700; color: #ec4899; text-transform: uppercase;">
+            FLUX AI High-Res Image Generator
+          </label>
+          <textarea
+            id="imagePrompt"
+            class="img-prompt"
+            placeholder="Describe any image... e.g. Cyberpunk tiger in neon street, ultra realistic 8k"
+          ></textarea>
+          <button class="generate-btn" onclick="generateImage()">
+            ✨ <span>Generate High-Res Image</span>
+          </button>
+        </div>
+
+        <div id="imageResultBox" class="img-preview-box">
+          <span id="imgPlaceholderText" style="color: #64748b; font-size: 13px; text-align: center; padding: 20px;">
+            🎨 Prompt लिखकर 'Generate Image' पर क्लिक करें। आपकी असली AI इमेज यहाँ दिखेगी।
+          </span>
+          <img id="generatedImg" class="result-image" style="display: none;" alt="Generated AI Art" />
+          <a
+            id="downloadImgBtn"
+            download="jam-ai-art.png"
+            target="_blank"
+            style="display: none; position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.8); color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 12px; text-decoration: none; font-weight: 600; border: 1px solid #475569;"
+          >
+            ⬇️ Download Image
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Arcade Games -->
+    <div id="tab-games" class="tab-panel">
+      <div class="game-panel">
+        <div class="game-select-row">
+          <button id="btnGameSpace" class="game-badge-btn active" onclick="selectGame('space')">
+            🚀 Space Shooter
+          </button>
+          <button id="btnGameSnake" class="game-badge-btn" onclick="selectGame('snake')">
+            🐍 Retro Snake
+          </button>
+        </div>
+
+        <div class="game-canvas-wrap">
+          <canvas id="gameCanvas" width="340" height="320"></canvas>
+        </div>
+
+        <!-- Touch Controls for Mobile -->
+        <div id="spaceControls" class="virtual-controls">
+          <button class="ctrl-btn" onclick="triggerKey('ArrowLeft')">◀ LEFT</button>
+          <button class="ctrl-btn" onclick="triggerKey('Restart')">🔄 RESTART</button>
+          <button class="ctrl-btn" onclick="triggerKey('ArrowRight')">RIGHT ▶</button>
+          <button class="ctrl-btn fire-btn" onclick="triggerKey('Space')">🔥 FIRE LASER</button>
+        </div>
+
+        <div id="snakeControls" class="virtual-controls" style="display: none;">
+          <div></div>
+          <button class="ctrl-btn" onclick="triggerKey('ArrowUp')">▲ UP</button>
+          <div></div>
+          <button class="ctrl-btn" onclick="triggerKey('ArrowLeft')">◀ LEFT</button>
+          <button class="ctrl-btn" onclick="triggerKey('ArrowDown')">▼ DOWN</button>
+          <button class="ctrl-btn" onclick="triggerKey('ArrowRight')">RIGHT ▶</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Study Lab -->
+    <div id="tab-study" class="tab-panel">
+      <div class="study-panel">
+        <div class="card-box">
+          <div class="card-title">🔬 Interactive Science & Tech Quiz</div>
+          <p id="quizQuestion" style="font-size: 13px; margin-bottom: 8px;">
+            प्रश्न: कंप्यूटर में 'CPU' का पूर्ण रूप (Full Form) क्या है?
+          </p>
+          <button class="quiz-opt-btn" onclick="checkQuizAnswer(this, false)">A. Central Processing Unit</button>
+          <button class="quiz-opt-btn" onclick="checkQuizAnswer(this, false)">B. Core Programming Unit</button>
+          <button class="quiz-opt-btn" onclick="checkQuizAnswer(this, false)">C. Computer Power Utility</button>
+          <button class="quiz-opt-btn" onclick="checkQuizAnswer(this, false)">D. Cyber Processor Union</button>
+          <div id="quizFeedback" style="margin-top: 10px; font-size: 13px; font-weight: 700;"></div>
+        </div>
+
+        <div class="card-box">
+          <div class="card-title">💡 Study Flashcard: Universal Knowledge</div>
+          <div id="flashcardBox" style="background: #1e293b; padding: 14px; border-radius: 12px; text-align: center; cursor: pointer;" onclick="flipFlashcard()">
+            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 4px;">TAP TO FLIP</div>
+            <div id="flashcardText" style="font-size: 14px; font-weight: 600; color: #38bdf8;">
+              प्रश्न: AI (Artificial Intelligence) का जनक किसे कहा जाता है?
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Bridge vibration helper
+    function vibratePhone(ms = 40) {
+      if (window.AndroidBridge && window.AndroidBridge.vibrate) {
+        window.AndroidBridge.vibrate(ms);
+      } else if (navigator.vibrate) {
+        navigator.vibrate(ms);
+      }
+    }
+
+    // Tab switcher
+    function switchTab(tabId, el) {
+      vibratePhone(25);
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+      el.classList.add('active');
+      const target = document.getElementById('tab-' + tabId);
+      if (target) target.classList.add('active');
+
+      if (tabId === 'games') {
+        startActiveGame();
+      } else {
+        stopGameLoop();
+      }
+    }
+
+    // Voice recognition
+    let recognition = null;
+    let isRecording = false;
+
+    function toggleVoiceInput() {
+      const micBtn = document.getElementById('micBtn');
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        alert('Voice recognition is not supported on this browser engine.');
+        return;
+      }
+
+      if (isRecording) {
+        recognition.stop();
+        micBtn.classList.remove('recording');
+        isRecording = false;
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.lang = 'hi-IN';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        isRecording = true;
+        micBtn.classList.add('recording');
+        vibratePhone(40);
+      };
+
+      recognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        document.getElementById('chatInput').value = transcript;
+        handleSendChat();
+      };
+
+      recognition.onend = () => {
+        isRecording = false;
+        micBtn.classList.remove('recording');
+      };
+
+      recognition.onerror = () => {
+        isRecording = false;
+        micBtn.classList.remove('recording');
+      };
+
+      recognition.start();
+    }
+
+    // Text To Speech
+    function speakText(text) {
+      vibratePhone(20);
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = 1.0;
+        utter.pitch = 1.0;
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    function copyMessageText(btn) {
+      vibratePhone(20);
+      const text = btn.parentElement.previousElementSibling.innerText;
+      navigator.clipboard.writeText(text);
+      btn.innerText = '✓ Copied!';
+      setTimeout(() => btn.innerText = '📋 कॉपी', 2000);
+    }
+
+    function clearChat() {
+      vibratePhone(30);
+      const chat = document.getElementById('chatMessages');
+      chat.innerHTML = `
+        <div class="msg msg-ai">
+          <div class="msg-author">JAM AI Assistant</div>
+          <p>बातचीत साफ़ कर दी गई है। मैं नई शुरुआत के लिए तैयार हूँ!</p>
+        </div>
+      `;
+    }
+
+    function sendChip(text) {
+      document.getElementById('chatInput').value = text;
+      handleSendChat();
+    }
+
+    // Chat handling
+    function handleSendChat() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      vibratePhone(30);
+      appendMessage('user', text);
+      input.value = '';
+
+      // Check if user requested an image inside chat
+      if (text.toLowerCase().includes('image') || text.toLowerCase().includes('फोटो') || text.toLowerCase().includes('तस्वीर') || text.toLowerCase().includes('photo')) {
+        setTimeout(() => {
+          generateChatImageResponse(text);
+        }, 600);
+        return;
+      }
+
+      // Check if user requested game
+      if (text.toLowerCase().includes('game') || text.toLowerCase().includes('गेम')) {
+        setTimeout(() => {
+          appendMessage('ai', `मैंने आपके लिए 'Arcade Games' टैब में **Retro Space Shooter** और **Retro Snake** गेम्स तैयार रखे हैं! ऊपर 🎮 **Arcade Games** टैब पर टैप करके आप तुरंत मोबाइल टच कंट्रोल्स के साथ खेल सकते हैं!`);
+        }, 500);
+        return;
+      }
+
+      // Show thinking indicator
+      const tempId = 'ai-loading-' + Date.now();
+      appendMessage('ai', 'सोच रहा हूँ...', tempId);
+
+      setTimeout(() => {
+        const loadingEl = document.getElementById(tempId);
+        if (loadingEl) loadingEl.remove();
+
+        const answer = getSmartAIResponse(text);
+        appendMessage('ai', answer);
+      }, 700);
+    }
+
+    function appendMessage(role, content, customId = null) {
+      const container = document.getElementById('chatMessages');
+      const div = document.createElement('div');
+      div.className = `msg msg-${role}`;
+      if (customId) div.id = customId;
+
+      if (role === 'user') {
+        div.innerText = content;
+      } else {
+        div.innerHTML = `
+          <div class="msg-author">JAM AI Assistant</div>
+          <div>${formatMarkdown(content)}</div>
+          <div class="msg-actions">
+            <button class="action-icon-btn" onclick="speakText(this.parentElement.previousElementSibling.innerText)">🔊 सुनें</button>
+            <button class="action-icon-btn" onclick="copyMessageText(this)">📋 कॉपी</button>
+          </div>
+        `;
+      }
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function formatMarkdown(text) {
+      let formatted = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code style="background:#1e293b; color:#38bdf8; padding:2px 5px; border-radius:4px; font-family:monospace;">$1</code>')
+        .replace(/\n/g, '<br/>');
+      return formatted;
+    }
+
+    // Conversational Intelligence Engine
+    function getSmartAIResponse(q) {
+      const lower = q.toLowerCase();
+
+      if (lower.includes('who are you') || lower.includes('tum kaun ho') || lower.includes('creator') || lower.includes('kisne banaya')) {
+        return `मैं **JAM AI (J-A-M AI)** हूँ — एक पावरफुल मोबाइल AI असिस्टेंट और क्रिएशन इंजन। मुझे **Vihaan Giri** ने आर्किटेक्ट और डेवलप किया है।`;
+      }
+
+      if (lower.includes('vihaan giri') || lower.includes('vihaan')) {
+        return `**Vihaan Giri** JAM AI के लीड आर्किटेक्ट और क्रिएटर हैं। उन्होंने इस एप्लीकेशन को पूरी तरह से मोबाइल-ऑप्टिमाइज़्ड और फास्ट बनाया है ताकि आप बिना किसी लैग के AI का आनंद ले सकें।`;
+      }
+
+      if (lower.includes('space') || lower.includes('shooter') || lower.includes('अंतरिक्ष')) {
+        return `अंतरिक्ष विज्ञान में हमारा ब्रह्मांड लगभग **13.8 अरब वर्ष** पुराना है। क्या आप जानते हैं कि प्रकाश को सूर्य से पृथ्वी तक पहुँचने में लगभग **8 मिनट 20 सेकंड** का समय लगता है? आप चाहें तो Arcade Games टैब में स्पेस शूटर भी खेल सकते हैं!`;
+      }
+
+      if (lower.includes('shayari') || lower.includes('शायरी') || lower.includes('कविता') || lower.includes('quote')) {
+        return `*मंजिलें उन्हीं को मिलती हैं, जिनके सपनों में जान होती है,*<br/>*पंखों से कुछ नहीं होता, हौसलों से उड़ान होती है!* ✨<br/><br/>— आपके लक्ष्य के लिए शुभकामनाएँ!`;
+      }
+
+      if (lower.includes('code') || lower.includes('python') || lower.includes('javascript') || lower.includes('html')) {
+        return `यहाँ एक उपयोगी JavaScript कोड उदाहरण है:<br/><pre>// JAM AI Quick Snippet\nfunction greetCreator(name) {\n  return \`Welcome to JAM AI, \${name}! Architected by Vihaan Giri.\`;\n}\nconsole.log(greetCreator('Vihaan'));</pre>`;
+      }
+
+      if (lower.includes('hello') || lower.includes('hi') || lower.includes('नमस्ते') || lower.includes('hey')) {
+        return `नमस्ते! JAM AI में आपका स्वागत है। बताइए आज मैं आपकी किस प्रकार सहायता कर सकता हूँ? आप मुझसे कोई भी प्रश्न पूछ सकते हैं, इमेज बना सकते हैं या गेम खेल सकते हैं!`;
+      }
+
+      return `आपके प्रश्न: **"${q}"** पर विचार किया गया।\n\nJAM AI एक बहुउद्देश्यीय कृत्रिम बुद्धिमत्ता प्रणाली है। यदि आपको किसी विशिष्ट विषय (जैसे विज्ञान, प्रौद्योगिकी, इतिहास, प्रोग्रामिंग, या दैनिक सलाह) पर गहन जानकारी चाहिए, तो कृपया खुलकर बताएं!`;
+    }
+
+    // Image Studio logic
+    function generateImage() {
+      const prompt = document.getElementById('imagePrompt').value.trim();
+      if (!prompt) {
+        alert('कृपया इमेज का विवरण (Prompt) दर्ज करें!');
+        return;
+      }
+      vibratePhone(40);
+      const resBox = document.getElementById('imageResultBox');
+      const placeholder = document.getElementById('imgPlaceholderText');
+      const imgEl = document.getElementById('generatedImg');
+      const downloadBtn = document.getElementById('downloadImgBtn');
+
+      placeholder.innerText = '🎨 AI इमेज तैयार हो रही है, कृपया 2-3 सेकंड प्रतीक्षा करें...';
+      imgEl.style.display = 'none';
+      downloadBtn.style.display = 'none';
+
+      const seed = Math.floor(Math.random() * 100000);
+      const encoded = encodeURIComponent(prompt + ', photorealistic, 8k resolution, cinematic lighting');
+      const imageUrl = `https://image.pollinations.ai/prompt/${encoded}?width=1024&height=1024&nologo=true&seed=${seed}`;
+
+      const preloader = new Image();
+      preloader.onload = () => {
+        imgEl.src = imageUrl;
+        imgEl.style.display = 'block';
+        placeholder.style.display = 'none';
+        downloadBtn.href = imageUrl;
+        downloadBtn.style.display = 'block';
+        vibratePhone(50);
+      };
+      preloader.onerror = () => {
+        placeholder.innerText = '⚠️ इमेज लोड करने में समस्या हुई। कृपया इंटरनेट कनेक्शन जांचें।';
+      };
+      preloader.src = imageUrl;
+    }
+
+    function generateChatImageResponse(prompt) {
+      appendMessage('ai', `आपकी इमेज तैयार हो रही है — <b>Created by Jam AI</b>`);
+      const seed = Math.floor(Math.random() * 100000);
+      const encoded = encodeURIComponent(prompt + ', photorealistic, 8k resolution, cinematic lighting');
+      const imageUrl = `https://image.pollinations.ai/prompt/${encoded}?width=800&height=800&nologo=true&seed=${seed}`;
+
+      const container = document.getElementById('chatMessages');
+      const div = document.createElement('div');
+      div.className = 'msg msg-ai';
+      div.innerHTML = `
+        <div class="msg-author">JAM AI Neural Art</div>
+        <p>"${prompt}"</p>
+        <img src="${imageUrl}" style="width:100%; border-radius:12px; margin-top:8px; box-shadow:0 4px 12px rgba(0,0,0,0.5);" alt="Created by Jam AI"/>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:12px; color:#34d399; font-weight:600;">
+          <span>✨ Created by Jam AI</span>
+          <span style="font-size:11px; color:#94a3b8;">8K Neural Studio</span>
+        </div>
+      `;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Games Engine (Space Shooter & Snake)
+    let currentGame = 'space';
+    let gameLoopId = null;
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function selectGame(game) {
+      vibratePhone(25);
+      currentGame = game;
+      document.getElementById('btnGameSpace').classList.toggle('active', game === 'space');
+      document.getElementById('btnGameSnake').classList.toggle('active', game === 'snake');
+      document.getElementById('spaceControls').style.display = game === 'space' ? 'grid' : 'none';
+      document.getElementById('snakeControls').style.display = game === 'snake' ? 'grid' : 'none';
+      startActiveGame();
+    }
+
+    function stopGameLoop() {
+      if (gameLoopId) {
+        cancelAnimationFrame(gameLoopId);
+        gameLoopId = null;
+      }
+    }
+
+    // Space Shooter Game State
+    let player = { x: 150, y: 270, w: 30, h: 20, speed: 6 };
+    let bullets = [];
+    let enemies = [];
+    let score = 0;
+    let gameOver = false;
+
+    function initSpaceShooter() {
+      player.x = canvas.width / 2 - 15;
+      player.y = canvas.height - 35;
+      bullets = [];
+      enemies = [];
+      score = 0;
+      gameOver = false;
+    }
+
+    function updateSpaceShooter() {
+      if (gameOver) {
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ef4444';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 10);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '14px sans-serif';
+        ctx.fillText('Score: ' + score, canvas.width / 2, canvas.height / 2 + 15);
+        ctx.fillText('Tap RESTART to play', canvas.width / 2, canvas.height / 2 + 40);
+        return;
+      }
+
+      ctx.fillStyle = '#050512';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Starfield background
+      ctx.fillStyle = '#ffffff';
+      for (let i = 0; i < 20; i++) {
+        let sx = (i * 27 + (Date.now() / 15)) % canvas.width;
+        let sy = (i * 39 + (Date.now() / 8)) % canvas.height;
+        ctx.fillRect(sx, sy, 1.5, 1.5);
+      }
+
+      // Draw Player Ship
+      ctx.fillStyle = '#6366f1';
+      ctx.beginPath();
+      ctx.moveTo(player.x + player.w / 2, player.y);
+      ctx.lineTo(player.x, player.y + player.h);
+      ctx.lineTo(player.x + player.w, player.y + player.h);
+      ctx.closePath();
+      ctx.fill();
+
+      // Bullets
+      ctx.fillStyle = '#38bdf8';
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        bullets[i].y -= 8;
+        ctx.fillRect(bullets[i].x, bullets[i].y, 3, 10);
+        if (bullets[i].y < 0) bullets.splice(i, 1);
+      }
+
+      // Spawn enemies
+      if (Math.random() < 0.04) {
+        enemies.push({ x: Math.random() * (canvas.width - 24), y: -20, w: 22, h: 18, speed: 1.8 + Math.random() * 1.5 });
+      }
+
+      // Enemies
+      ctx.fillStyle = '#f43f5e';
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        let e = enemies[i];
+        e.y += e.speed;
+        ctx.fillRect(e.x, e.y, e.w, e.h);
+
+        // Check bullet hit
+        for (let b = bullets.length - 1; b >= 0; b--) {
+          if (bullets[b].x >= e.x && bullets[b].x <= e.x + e.w && bullets[b].y >= e.y && bullets[b].y <= e.y + e.h) {
+            enemies.splice(i, 1);
+            bullets.splice(b, 1);
+            score += 10;
+            vibratePhone(20);
+            break;
+          }
+        }
+
+        // Check hit player
+        if (e && e.y + e.h >= player.y && e.x + e.w >= player.x && e.x <= player.x + player.w) {
+          gameOver = true;
+          vibratePhone(80);
+        }
+
+        if (e && e.y > canvas.height) enemies.splice(i, 1);
+      }
+
+      // Score
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('Score: ' + score, 10, 20);
+
+      gameLoopId = requestAnimationFrame(updateSpaceShooter);
+    }
+
+    // Snake Game State
+    let snake = [{x: 10, y: 10}];
+    let food = {x: 5, y: 5};
+    let dx = 1, dy = 0;
+    let snakeScore = 0;
+    let snakeGameOver = false;
+    let snakeSpeedCounter = 0;
+
+    function initSnake() {
+      snake = [{x: 8, y: 8}, {x: 7, y: 8}];
+      food = {x: 14, y: 14};
+      dx = 1; dy = 0;
+      snakeScore = 0;
+      snakeGameOver = false;
+    }
+
+    function updateSnake() {
+      snakeSpeedCounter++;
+      if (snakeSpeedCounter % 7 === 0 && !snakeGameOver) {
+        let head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+        // Wrap around
+        const cols = 20;
+        const rows = 18;
+        if (head.x < 0) head.x = cols - 1;
+        if (head.x >= cols) head.x = 0;
+        if (head.y < 0) head.y = rows - 1;
+        if (head.y >= rows) head.y = 0;
+
+        // Check collision
+        for (let segment of snake) {
+          if (segment.x === head.x && segment.y === head.y) {
+            snakeGameOver = true;
+            vibratePhone(80);
+          }
+        }
+
+        snake.unshift(head);
+        if (head.x === food.x && head.y === food.y) {
+          snakeScore += 5;
+          vibratePhone(25);
+          food = {
+            x: Math.floor(Math.random() * cols),
+            y: Math.floor(Math.random() * rows)
+          };
+        } else {
+          snake.pop();
+        }
+      }
+
+      // Render
+      ctx.fillStyle = '#060b14';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const cellW = canvas.width / 20;
+      const cellH = canvas.height / 18;
+
+      // Draw Food
+      ctx.fillStyle = '#10b981';
+      ctx.fillRect(food.x * cellW + 1, food.y * cellH + 1, cellW - 2, cellH - 2);
+
+      // Draw Snake
+      ctx.fillStyle = '#6366f1';
+      snake.forEach((seg, idx) => {
+        ctx.fillStyle = idx === 0 ? '#a5b4fc' : '#6366f1';
+        ctx.fillRect(seg.x * cellW + 1, seg.y * cellH + 1, cellW - 2, cellH - 2);
+      });
+
+      // Score
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('Snake Score: ' + snakeScore, 10, 20);
+
+      if (snakeGameOver) {
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ef4444';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 10);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '14px sans-serif';
+        ctx.fillText('Tap any Arrow to Restart', canvas.width / 2, canvas.height / 2 + 15);
+      }
+
+      gameLoopId = requestAnimationFrame(updateSnake);
+    }
+
+    function startActiveGame() {
+      stopGameLoop();
+      if (currentGame === 'space') {
+        initSpaceShooter();
+        updateSpaceShooter();
+      } else {
+        initSnake();
+        updateSnake();
+      }
+    }
+
+    function triggerKey(action) {
+      vibratePhone(25);
+      if (currentGame === 'space') {
+        if (action === 'ArrowLeft') player.x = Math.max(0, player.x - 20);
+        if (action === 'ArrowRight') player.x = Math.min(canvas.width - player.w, player.x + 20);
+        if (action === 'Space') bullets.push({ x: player.x + player.w / 2 - 1.5, y: player.y });
+        if (action === 'Restart' || gameOver) initSpaceShooter();
+      } else {
+        if (snakeGameOver) {
+          initSnake();
+          return;
+        }
+        if (action === 'ArrowUp' && dy !== 1) { dx = 0; dy = -1; }
+        if (action === 'ArrowDown' && dy !== -1) { dx = 0; dy = 1; }
+        if (action === 'ArrowLeft' && dx !== 1) { dx = -1; dy = 0; }
+        if (action === 'ArrowRight' && dx !== -1) { dx = 1; dy = 0; }
+      }
+    }
+
+    // Keyboard support
+    window.addEventListener('keydown', (e) => {
+      triggerKey(e.code);
+    });
+
+    // Quiz & Flashcard logic
+    function checkQuizAnswer(btn, isCorrect) {
+      vibratePhone(30);
+      const feedback = document.getElementById('quizFeedback');
+      if (btn.innerText.includes('Central Processing Unit')) {
+        btn.style.background = '#059669';
+        btn.style.borderColor = '#34d399';
+        feedback.innerText = '✅ बिल्कुल सही! CPU का मतलब Central Processing Unit है।';
+        feedback.style.color = '#34d399';
+      } else {
+        btn.style.background = '#991b1b';
+        btn.style.borderColor = '#f87171';
+        feedback.innerText = '❌ यह सही नहीं है। सही उत्तर है: Central Processing Unit (CPU)';
+        feedback.style.color = '#f87171';
+      }
+    }
+
+    let isFlipped = false;
+    function flipFlashcard() {
+      vibratePhone(20);
+      const textEl = document.getElementById('flashcardText');
+      isFlipped = !isFlipped;
+      if (isFlipped) {
+        textEl.innerHTML = 'उत्तर: <strong>जॉन मैकार्थी (John McCarthy)</strong><br/><span style="font-size:12px; color:#cbd5e1;">उन्होंने 1956 में "Artificial Intelligence" शब्द गढ़ा था।</span>';
+        textEl.style.color = '#34d399';
+      } else {
+        textEl.innerText = 'प्रश्न: AI (Artificial Intelligence) का जनक किसे कहा जाता है?';
+        textEl.style.color = '#38bdf8';
+      }
+    }
+  </script>
+</body>
+</html>
